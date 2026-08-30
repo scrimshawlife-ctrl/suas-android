@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -79,6 +81,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SuasScreen(onRideClick: () -> Unit) {
+    val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = BackgroundOffWhite
@@ -87,6 +90,7 @@ fun SuasScreen(onRideClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(scrollState)
         ) {
             // SOS Banner
             Box(
@@ -174,7 +178,7 @@ fun SuasScreen(onRideClick: () -> Unit) {
                     onClick = {}
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(28.dp))
 
                 // Footer
                 Column(
@@ -204,6 +208,7 @@ fun RideRequestScreen(onBack: () -> Unit) {
     var address by remember { mutableStateOf("") }
     var destination by remember { mutableStateOf("") }
     var pickupTime by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -234,7 +239,8 @@ fun RideRequestScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
