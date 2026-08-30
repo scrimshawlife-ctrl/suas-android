@@ -44,10 +44,14 @@ Synthetic staging is [https://suasqrf.com](https://suasqrf.com). Point a future 
 This tree is a Kotlin Jetpack Compose UI scaffold. It is a fork of [RuntimeSquad/Suas](https://github.com/RuntimeSquad/Suas). Observed today:
 
 - Package and application ID remain `com.example.suas`.
-- `MainActivity` renders a local home (ride, food, shelter cards) and a local ride-request form.
-- Ride confirm does not submit. Food and shelter cards have no handlers.
-- There is no HTTP client, no session store, no OpenAPI binding, and no `INTERNET` permission.
+- Home and ride-request pages scroll. Accessibility semantics are present and do not change the visual layout.
+- Home shows ride, food, and shelter cards. The former "Tap what you need" section is gone.
+- The ride-request form can prefill a current-location field. Food and shelter cards have no handlers.
+- `MainActivity` includes a Retrofit POST to a non-product host. That call is not the SUAS Worker `/api/v0` contract and is not a live ride provider.
+- The manifest declares `INTERNET`. There is no session store and no OpenAPI binding.
 - Default Gradle unit and instrumented example tests are the only tests.
+
+MVP request categories are FOOD, TRANSPORTATION, temporary SHELTER, and PEER_SUPPORT. Do not add medical or VA-treatment claims in the Android UI.
 
 Do not treat the on-screen copy in this scaffold as released crisis copy. D-012 approved wording lives in SUAS-specs.
 
@@ -76,7 +80,7 @@ You need Android Studio (or the Android SDK) with JDK 11 or later.
 ./gradlew :app:test
 ```
 
-Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold has no backend dependency today.
+Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold still has no Worker `/api/v0` client. Do not treat the current ride POST as a product ride provider.
 
 ## What SUAS is not
 
