@@ -137,26 +137,6 @@ fun SuasScreen(onRideClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // Instruction Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                ) {
-                    Text(
-                        text = "Tap what you need. Help is free.",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 28.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(28.dp))
-
                 // Service Cards
                 ServiceCard(
                     icon = "🚗",
