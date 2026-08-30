@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DirectionsCar
@@ -89,14 +92,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SuasScreen(onRideClick: () -> Unit) {
+    val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = BackgroundOffWhite
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerPadding)
+                .verticalScroll(scrollState)
         ) {
             // SOS Banner
             Box(
@@ -116,8 +121,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp),
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(36.dp))
@@ -184,7 +189,7 @@ fun SuasScreen(onRideClick: () -> Unit) {
                     onClick = {}
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(28.dp))
 
                 // Footer
                 Column(
@@ -211,8 +216,10 @@ fun SuasScreen(onRideClick: () -> Unit) {
 
 @Composable
 fun RideRequestScreen(onBack: () -> Unit) {
+    val scrollState = rememberScrollState()
     var address by remember { mutableStateOf("") }
     var destination by remember { mutableStateOf("") }
+    var pickupTime by remember { mutableStateOf("") }
     var enterByHand by remember { mutableStateOf(true) }
 
     Scaffold(
@@ -241,9 +248,11 @@ fun RideRequestScreen(onBack: () -> Unit) {
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
+                .imePadding(),
             horizontalAlignment = Alignment.Start
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -383,6 +392,35 @@ fun RideRequestScreen(onBack: () -> Unit) {
                 value = destination,
                 onValueChange = { destination = it },
                 placeholder = { Text("Destination address or place", color = Color.LightGray) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(4.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(12.dp),
+                textStyle = TextStyle(fontSize = 16.sp)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Pickup Time Section
+            Text(
+                text = "WHEN DO YOU NEED PICKUP?",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray,
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+
+            TextField(
+                value = pickupTime,
+                onValueChange = { pickupTime = it },
+                placeholder = { Text("Pickup time (e.g., Now, 5:00 PM)", color = Color.LightGray) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, RoundedCornerShape(12.dp))
