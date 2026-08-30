@@ -47,8 +47,8 @@ This tree is a Kotlin Jetpack Compose UI scaffold. It is a fork of [RuntimeSquad
 - Home and ride-request pages scroll. Accessibility semantics are present and do not change the visual layout.
 - Home shows ride, food, and shelter cards. The former "Tap what you need" section is gone.
 - The ride-request form can prefill a current-location field. Food and shelter cards have no handlers.
-- `MainActivity` includes a Retrofit POST to a non-product host. That call is not the SUAS Worker `/api/v0` contract and is not a live ride provider.
-- The manifest declares `INTERNET`. There is no session store and no OpenAPI binding.
+- `MainActivity` still contains a local ride-request form. Submit is disconnected and must not fake success. Do not treat leftover Retrofit dependencies as a live ride provider.
+- The native client still has no Worker `/api/v0` client, no session store, and no OpenAPI binding. The manifest may declare `INTERNET` from upstream scaffold work.
 - Default Gradle unit and instrumented example tests are the only tests.
 
 MVP request categories are FOOD, TRANSPORTATION, temporary SHELTER, and PEER_SUPPORT. Do not add medical or VA-treatment claims in the Android UI.
