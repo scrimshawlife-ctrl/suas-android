@@ -50,6 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -108,7 +112,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(SosRed)
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 12.dp)
+                    .semantics(mergeDescendants = true) {},
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -132,7 +137,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    lineHeight = 32.sp
+                    lineHeight = 32.sp,
+                    modifier = Modifier.semantics { heading() }
                 )
 
                 Spacer(modifier = Modifier.height(28.dp))
@@ -221,7 +227,9 @@ fun RideRequestScreen(onBack: () -> Unit) {
                     text = "Confirm request",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .semantics { heading() }
                 )
             }
         }
@@ -285,7 +293,9 @@ fun RideRequestScreen(onBack: () -> Unit) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 8.dp)
+                    .semantics { heading() }
             )
 
             Card(
@@ -365,7 +375,9 @@ fun RideRequestScreen(onBack: () -> Unit) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 8.dp)
+                    .semantics { heading() }
             )
 
             TextField(
@@ -394,7 +406,9 @@ fun RideRequestScreen(onBack: () -> Unit) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 8.dp)
+                    .semantics { heading() }
             )
 
             TextField(
@@ -444,13 +458,17 @@ fun ServiceCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(2.dp, textColor, RoundedCornerShape(20.dp))
-            .clickable { onClick() },
+            .clickable(
+                onClick = onClick,
+                role = Role.Button
+            ),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 20.dp),
+                .padding(vertical = 24.dp, horizontal = 20.dp)
+                .semantics(mergeDescendants = true) {},
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
