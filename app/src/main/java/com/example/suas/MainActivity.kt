@@ -47,13 +47,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,6 +73,54 @@ import com.example.suas.ui.theme.ShelterPurpleBg
 import com.example.suas.ui.theme.ShelterPurpleText
 import com.example.suas.ui.theme.SosRed
 import com.example.suas.ui.theme.SuasTheme
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.Header
+import retrofit2.http.POST
+import java.util.UUID
+
+// API Models
+data class RideRequest(
+    val rider: Rider,
+    val currentAddress: AddressInfo,
+    val destinationAddress: AddressInfo,
+    val durationMinutes: Int = 30,
+    val maxDistanceKm: Int = 40,
+    val notes: String = "App Request"
+)
+
+data class Rider(
+    val name: String,
+    val veteran: Boolean = true,
+    val phone: String
+)
+
+data class AddressInfo(
+    val address: String,
+    val zipCode: String = ""
+)
+
+interface RideRequestApi {
+    @POST("api/v1/ride-requests")
+    suspend fun postRideRequest(
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Body request: RideRequest
+    ): retrofit2.Response<Unit>
+}
+
+object RetrofitClient {
+    private const val BASE_URL = "https://suas-vetran-network-w6f1.vercel.app/"
+
+    val api: RideRequestApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RideRequestApi::class.java)
+    }
+}
 
 enum class Screen {
     Main,
@@ -203,10 +253,18 @@ fun SuasScreen(onRideClick: () -> Unit) {
 @Composable
 fun RideRequestScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
-    var address by remember { mutableStateOf("") }
-    var destination by remember { mutableStateOf("") }
-    var pickupTime by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var riderName by remember { mutableStateOf("Deployment Sanity Rider") }
+    var riderPhone by remember { mutableStateOf("+1-650-555-0199") }
+    var address by remember { mutableStateOf("855 W Maude Ave, Mountain View, CA") }
+    var addressZip by remember { mutableStateOf("94043") }
+    var destination by remember { mutableStateOf("500 Castro St, Mountain View, CA") }
+    var destinationZip by remember { mutableStateOf("94041") }
+    var pickupTime by remember { mutableStateOf("Now") }
     var enterByHand by remember { mutableStateOf(true) }
+    var isSubmitting by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -244,6 +302,56 @@ fun RideRequestScreen(onBack: () -> Unit) {
             horizontalAlignment = Alignment.Start
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Rider Info Section
+            Text(
+                text = "RIDER INFORMATION",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray,
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 8.dp)
+                    .semantics { heading() }
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column {
+                    TextField(
+                        value = riderName,
+                        onValueChange = { riderName = it },
+                        placeholder = { Text("Your full name", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = TextStyle(fontSize = 16.sp)
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = Color.LightGray)
+                    TextField(
+                        value = riderPhone,
+                        onValueChange = { riderPhone = it },
+                        placeholder = { Text("Phone number", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = TextStyle(fontSize = 16.sp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Service Summary Card
             Card(
@@ -363,6 +471,20 @@ fun RideRequestScreen(onBack: () -> Unit) {
                             ),
                             textStyle = TextStyle(fontSize = 16.sp)
                         )
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = Color.LightGray)
+                        TextField(
+                            value = addressZip,
+                            onValueChange = { addressZip = it },
+                            placeholder = { Text("Zip code", color = Color.LightGray) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            textStyle = TextStyle(fontSize = 16.sp)
+                        )
                     }
                 }
             }
@@ -380,23 +502,42 @@ fun RideRequestScreen(onBack: () -> Unit) {
                     .semantics { heading() }
             )
 
-            TextField(
-                value = destination,
-                onValueChange = { destination = it },
-                placeholder = { Text("Destination address or place", color = Color.LightGray) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, RoundedCornerShape(12.dp))
-                    .padding(4.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp),
-                textStyle = TextStyle(fontSize = 16.sp)
-            )
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column {
+                    TextField(
+                        value = destination,
+                        onValueChange = { destination = it },
+                        placeholder = { Text("Destination address or place", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = TextStyle(fontSize = 16.sp)
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = Color.LightGray)
+                    TextField(
+                        value = destinationZip,
+                        onValueChange = { destinationZip = it },
+                        placeholder = { Text("Destination zip code", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = TextStyle(fontSize = 16.sp)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -432,14 +573,59 @@ fun RideRequestScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = { /* Submit logic */ },
+                onClick = {
+                    isSubmitting = true
+                    coroutineScope.launch {
+                        try {
+                            val request = RideRequest(
+                                rider = Rider(
+                                    name = riderName,
+                                    phone = riderPhone
+                                ),
+                                currentAddress = AddressInfo(
+                                    address = address,
+                                    zipCode = addressZip
+                                ),
+                                destinationAddress = AddressInfo(
+                                    address = destination,
+                                    zipCode = destinationZip
+                                ),
+                                durationMinutes = 30,
+                                maxDistanceKm = 40,
+                                notes = "Pickup Time: $pickupTime. Live sanity test."
+                            )
+                            val response = RetrofitClient.api.postRideRequest(
+                                idempotencyKey = "sanity-94043-${System.currentTimeMillis()}",
+                                request = request
+                            )
+                            if (response.isSuccessful) {
+                                android.widget.Toast.makeText(context, "Ride Requested Successfully!", android.widget.Toast.LENGTH_LONG).show()
+                                onBack()
+                            } else {
+                                android.widget.Toast.makeText(context, "Failed to request ride: ${response.code()}", android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: Exception) {
+                            android.widget.Toast.makeText(context, "Error: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                        } finally {
+                            isSubmitting = false
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isSubmitting) Color.LightGray else Color.Gray
+                ),
+                enabled = !isSubmitting && address.isNotBlank() && destination.isNotBlank()
             ) {
-                Text("Request Free Ride", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    text = if (isSubmitting) "Submitting..." else "Request Free Ride",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
