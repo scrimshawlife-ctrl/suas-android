@@ -46,10 +46,10 @@ This tree is a Kotlin Jetpack Compose UI scaffold. It is a fork of [RuntimeSquad
 - Package and application ID remain `com.example.suas`.
 - Home and ride-request pages scroll. Accessibility semantics are present and do not change the visual layout.
 - Home shows ride, food, and shelter cards. The former "Tap what you need" section is gone.
-- The ride-request form can prefill a current-location field. Food and shelter cards have no handlers.
-- `MainActivity` includes a Retrofit POST to a non-product host. That call is not the SUAS Worker `/api/v0` contract and is not a live ride provider.
-- The manifest declares `INTERNET`. There is no session store and no OpenAPI binding.
-- Default Gradle unit and instrumented example tests are the only tests.
+- The ride-request form can prefill and edit pickup, destination, ZIP, and timing fields. Submission is explicitly disabled until a real backend contract is connected.
+- Food and shelter cards intentionally have no handlers, so they do not imply unavailable fulfillment.
+- There is no Retrofit client, session store, or OpenAPI binding. The manifest still declares `INTERNET`, but the scaffold performs no support-request network call.
+- JVM tests cover the package baseline. Instrumented Compose tests cover support options, form editing, disabled submission, cancellation/back navigation, and package context on an emulator.
 
 MVP request categories are FOOD, TRANSPORTATION, temporary SHELTER, and PEER_SUPPORT. Do not add medical or VA-treatment claims in the Android UI.
 
@@ -80,7 +80,7 @@ You need Android Studio (or the Android SDK) with JDK 11 or later.
 ./gradlew :app:test
 ```
 
-Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold still has no Worker `/api/v0` client. Do not treat the current ride POST as a product ride provider.
+Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold has no Worker `/api/v0` client and performs no support-request network call.
 
 ## What SUAS is not
 

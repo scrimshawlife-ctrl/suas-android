@@ -47,11 +47,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
@@ -71,56 +69,7 @@ import com.example.suas.ui.theme.RideBlueBg
 import com.example.suas.ui.theme.RideBlueText
 import com.example.suas.ui.theme.ShelterPurpleBg
 import com.example.suas.ui.theme.ShelterPurpleText
-import com.example.suas.ui.theme.SosRed
 import com.example.suas.ui.theme.SuasTheme
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.POST
-import java.util.UUID
-
-// API Models
-data class RideRequest(
-    val rider: Rider,
-    val currentAddress: AddressInfo,
-    val destinationAddress: AddressInfo,
-    val durationMinutes: Int = 30,
-    val maxDistanceKm: Int = 40,
-    val notes: String = "App Request"
-)
-
-data class Rider(
-    val name: String,
-    val veteran: Boolean = true,
-    val phone: String
-)
-
-data class AddressInfo(
-    val address: String,
-    val zipCode: String = ""
-)
-
-interface RideRequestApi {
-    @POST("api/v1/ride-requests")
-    suspend fun postRideRequest(
-        @Header("Idempotency-Key") idempotencyKey: String,
-        @Body request: RideRequest
-    ): retrofit2.Response<Unit>
-}
-
-object RetrofitClient {
-    private const val BASE_URL = "https://suas-vetran-network-w6f1.vercel.app/"
-
-    val api: RideRequestApi by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(RideRequestApi::class.java)
-    }
-}
 
 enum class Screen {
     Main,
@@ -157,23 +106,6 @@ fun SuasScreen(onRideClick: () -> Unit) {
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            // SOS Banner
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(SosRed)
-                    .padding(vertical = 12.dp)
-                    .semantics(mergeDescendants = true) {},
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "🆘 Immediate danger? Call 988 · Press 1",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -196,8 +128,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
                 // Service Cards
                 ServiceCard(
                     icon = "🚗",
-                    title = "Free Ride",
-                    subtitle = "Waymo · Amazon AV · Dispatched now",
+                    title = "Transportation",
+                    subtitle = "Ask for transportation support. Availability is confirmed by the support team.",
                     backgroundColor = RideBlueBg,
                     textColor = RideBlueText,
                     onClick = onRideClick
@@ -207,8 +139,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
 
                 ServiceCard(
                     icon = "🍲",
-                    title = "Free Food",
-                    subtitle = "Hot meal · Delivered to you",
+                    title = "Food",
+                    subtitle = "Ask for food support. Availability and fulfillment are not guaranteed.",
                     backgroundColor = FoodGreenBg,
                     textColor = FoodGreenText,
                     onClick = {}
@@ -218,8 +150,8 @@ fun SuasScreen(onRideClick: () -> Unit) {
 
                 ServiceCard(
                     icon = "🏨",
-                    title = "Free Shelter",
-                    subtitle = "Hotel voucher · No payment needed",
+                    title = "Temporary Shelter",
+                    subtitle = "Ask for temporary shelter support. No reservation or voucher is promised.",
                     backgroundColor = ShelterPurpleBg,
                     textColor = ShelterPurpleText,
                     onClick = {}
@@ -233,7 +165,7 @@ fun SuasScreen(onRideClick: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "All services free · Paid by corporate sponsors",
+                        text = "SUAS coordinates practical support. It is not an emergency service.",
                         color = FooterTextGrey,
                         fontSize = 15.sp
                     )
@@ -253,9 +185,6 @@ fun SuasScreen(onRideClick: () -> Unit) {
 @Composable
 fun RideRequestScreen(onBack: () -> Unit) {
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-
     var riderName by remember { mutableStateOf("Deployment Sanity Rider") }
     var riderPhone by remember { mutableStateOf("+1-650-555-0199") }
     var address by remember { mutableStateOf("855 W Maude Ave, Mountain View, CA") }
@@ -264,7 +193,6 @@ fun RideRequestScreen(onBack: () -> Unit) {
     var destinationZip by remember { mutableStateOf("94041") }
     var pickupTime by remember { mutableStateOf("Now") }
     var enterByHand by remember { mutableStateOf(true) }
-    var isSubmitting by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -380,12 +308,12 @@ fun RideRequestScreen(onBack: () -> Unit) {
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Free Ride",
+                            text = "Transportation",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Rideshare, dispatched now",
+                            text = "Availability is confirmed by the support team",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
@@ -573,55 +501,16 @@ fun RideRequestScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = {
-                    isSubmitting = true
-                    coroutineScope.launch {
-                        try {
-                            val request = RideRequest(
-                                rider = Rider(
-                                    name = riderName,
-                                    phone = riderPhone
-                                ),
-                                currentAddress = AddressInfo(
-                                    address = address,
-                                    zipCode = addressZip
-                                ),
-                                destinationAddress = AddressInfo(
-                                    address = destination,
-                                    zipCode = destinationZip
-                                ),
-                                durationMinutes = 30,
-                                maxDistanceKm = 40,
-                                notes = "Pickup Time: $pickupTime. Live sanity test."
-                            )
-                            val response = RetrofitClient.api.postRideRequest(
-                                idempotencyKey = "sanity-94043-${System.currentTimeMillis()}",
-                                request = request
-                            )
-                            if (response.isSuccessful) {
-                                android.widget.Toast.makeText(context, "Ride Requested Successfully!", android.widget.Toast.LENGTH_LONG).show()
-                                onBack()
-                            } else {
-                                android.widget.Toast.makeText(context, "Failed to request ride: ${response.code()}", android.widget.Toast.LENGTH_LONG).show()
-                            }
-                        } catch (e: Exception) {
-                            android.widget.Toast.makeText(context, "Error: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
-                        } finally {
-                            isSubmitting = false
-                        }
-                    }
-                },
+                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSubmitting) Color.LightGray else Color.Gray
-                ),
-                enabled = !isSubmitting && address.isNotBlank() && destination.isNotBlank()
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                enabled = false
             ) {
                 Text(
-                    text = if (isSubmitting) "Submitting..." else "Request Free Ride",
+                    text = "Submission not connected",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
