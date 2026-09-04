@@ -69,7 +69,6 @@ import com.example.suas.ui.theme.RideBlueBg
 import com.example.suas.ui.theme.RideBlueText
 import com.example.suas.ui.theme.ShelterPurpleBg
 import com.example.suas.ui.theme.ShelterPurpleText
-import com.example.suas.ui.theme.SosRed
 import com.example.suas.ui.theme.SuasTheme
 
 enum class Screen {
@@ -107,23 +106,6 @@ fun SuasScreen(onRideClick: () -> Unit) {
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            // SOS Banner
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(SosRed)
-                    .padding(vertical = 12.dp)
-                    .semantics(mergeDescendants = true) {},
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Immediate danger or medical emergency? Call 911. Call or text 988 for the Suicide & Crisis Lifeline.",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

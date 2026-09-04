@@ -36,9 +36,9 @@ class ExampleInstrumentedTest {
     }
 
     @Test
-    fun mainScreenShowsSafetyAndSupportOptions() {
-        composeRule.onNodeWithText("Immediate danger or medical emergency? Call 911. Call or text 988 for the Suicide & Crisis Lifeline.")
-            .assertIsDisplayed()
+    fun mainScreenDoesNotExposeUnreleasedCrisisDirectionsAndShowsSupportOptions() {
+        composeRule.onNodeWithText("911", substring = true).assertDoesNotExist()
+        composeRule.onNodeWithText("988", substring = true).assertDoesNotExist()
         composeRule.onNodeWithText("Transportation").assertIsDisplayed()
         composeRule.onNodeWithText("Food").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Temporary Shelter").performScrollTo().assertIsDisplayed()

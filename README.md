@@ -80,7 +80,7 @@ You need Android Studio (or the Android SDK) with JDK 11 or later.
 ./gradlew :app:test
 ```
 
-Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold still has no Worker `/api/v0` client. Do not treat the current ride POST as a product ride provider.
+Open the project in Android Studio and run the `app` configuration on an emulator or device. The scaffold has no Worker `/api/v0` client and performs no support-request network call.
 
 ## What SUAS is not
 
