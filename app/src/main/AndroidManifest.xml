@@ -14,17 +14,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Suas">
         <activity
-            android:name=".MainActivity"
+            android:name=".RootActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Suas"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.Suas"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
