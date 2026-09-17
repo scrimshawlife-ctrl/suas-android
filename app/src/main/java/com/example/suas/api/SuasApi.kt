@@ -5,12 +5,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 
-/**
- * Released `/api/v0` surface used by iOS `APIClient.swift`.
- * Do not add `/api/mobile`. Do not call `/app/*`.
- * Do not add `/api/v0/dev/*` — those 404 on staging.
- */
 interface SuasApi {
     @POST("/api/v0/auth/challenges")
     suspend fun issueChallenge(@Body body: ChallengeBody): Response<Unit>
@@ -29,4 +25,20 @@ interface SuasApi {
         @Header("Authorization") authorization: String,
         @Header("Idempotency-Key") idempotencyKey: String,
     ): OpenCaseResponse
+
+    @POST("/api/v0/cases/{caseId}/service-requests")
+    suspend fun createServiceRequest(
+        @Header("Authorization") authorization: String,
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Path("caseId") caseId: String,
+        @Body body: CreateServiceRequestBody,
+    ): ServiceRequestDto
+
+    @POST("/api/v0/service-requests/{id}/commands/{command}")
+    suspend fun command(
+        @Header("Authorization") authorization: String,
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Path("id") id: String,
+        @Path("command") command: String,
+    ): ServiceRequestDto
 }
