@@ -2,8 +2,9 @@ package com.example.suas.api
 
 /**
  * Build-pinned host and synthetic tenant.
- * The person does not pick a tenant. JSON auth still requires tenant_id on the
- * wire (Worker issueBody). This constant is the LOCAL/STAGING seed, not a picker.
+ * The person does not pick a tenant. The Worker resolves enrolled email → tenant
+ * and treats tenant_id as optional. Clients may still send this seed UUID as a
+ * filter. It is not a person-facing picker.
  */
 object Backend {
     const val STAGING_BASE = "https://suasqrf.com"
