@@ -18,6 +18,7 @@ private enum class RootScreen {
     Ride,
     Food,
     Shelter,
+    Peer,
 }
 
 class RootActivity : ComponentActivity() {
@@ -37,6 +38,7 @@ class RootActivity : ComponentActivity() {
                         onRide = { screen = RootScreen.Ride },
                         onFood = { screen = RootScreen.Food },
                         onShelter = { screen = RootScreen.Shelter },
+                        onPeer = { screen = RootScreen.Peer },
                     )
                     RootScreen.SignIn -> SignInScreen(
                         api = api,
@@ -60,6 +62,13 @@ class RootActivity : ComponentActivity() {
                     )
                     RootScreen.Shelter -> ConnectedRequestScreen(
                         kind = SupportKind.Shelter,
+                        api = api,
+                        session = session,
+                        onNeedSignIn = { screen = RootScreen.SignIn },
+                        onBack = { screen = RootScreen.Home },
+                    )
+                    RootScreen.Peer -> ConnectedRequestScreen(
+                        kind = SupportKind.Peer,
                         api = api,
                         session = session,
                         onNeedSignIn = { screen = RootScreen.SignIn },
