@@ -23,5 +23,8 @@ val FoodGreenText = Color(0xFF559D62)
 val ShelterPurpleBg = Color(0xFFF2EAF9)
 val ShelterPurpleText = Color(0xFF8C63BF)
 
+val PeerTealBg = Color(0xFFE4F3F1)
+val PeerTealText = Color(0xFF2F7A72)
+
 val FooterTextGrey = Color(0xFF757575)
 val LinkGold = Color(0xFFB8860B)
