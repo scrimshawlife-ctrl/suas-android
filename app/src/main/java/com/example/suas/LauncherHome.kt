@@ -25,6 +25,8 @@ import com.example.suas.ui.theme.FoodGreenBg
 import com.example.suas.ui.theme.FoodGreenText
 import com.example.suas.ui.theme.FooterTextGrey
 import com.example.suas.ui.theme.LinkGold
+import com.example.suas.ui.theme.PeerTealBg
+import com.example.suas.ui.theme.PeerTealText
 import com.example.suas.ui.theme.RideBlueBg
 import com.example.suas.ui.theme.RideBlueText
 import com.example.suas.ui.theme.ShelterPurpleBg
@@ -37,6 +39,7 @@ fun LauncherHome(
     onRide: () -> Unit,
     onFood: () -> Unit,
     onShelter: () -> Unit,
+    onPeer: () -> Unit,
 ) {
     val scroll = rememberScrollState()
     Scaffold(containerColor = BackgroundOffWhite) { inner ->
@@ -85,6 +88,15 @@ fun LauncherHome(
                 backgroundColor = ShelterPurpleBg,
                 textColor = ShelterPurpleText,
                 onClick = onShelter,
+            )
+            Spacer(Modifier.height(20.dp))
+            ServiceCard(
+                icon = "🤝",
+                title = "Peer Support",
+                subtitle = "Ask for peer or human support. Not therapy, not crisis dispatch, and not guaranteed.",
+                backgroundColor = PeerTealBg,
+                textColor = PeerTealText,
+                onClick = onPeer,
             )
             Spacer(Modifier.height(28.dp))
             Text(
