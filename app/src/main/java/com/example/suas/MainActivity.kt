@@ -123,6 +123,16 @@ fun SuasScreen(onRideClick: () -> Unit) {
                     modifier = Modifier.semantics { heading() }
                 )
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "TEST HARNESS ONLY — not the product launcher. Product flows live on RootActivity with /api/v0.",
+                    color = FooterTextGrey,
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 Spacer(modifier = Modifier.height(28.dp))
 
                 // Service Cards
