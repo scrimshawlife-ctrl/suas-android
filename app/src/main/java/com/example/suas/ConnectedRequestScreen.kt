@@ -46,6 +46,11 @@ enum class SupportKind(
         "Temporary Shelter",
         "Ask for temporary shelter. No reservation or voucher is promised.",
     ),
+    Peer(
+        Categories.PEER_SUPPORT,
+        "Peer Support",
+        "Ask for peer or human support. Not therapy, not crisis dispatch, and not guaranteed.",
+    ),
 }
 
 @Composable
@@ -94,6 +99,14 @@ fun ConnectedRequestScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+            SupportKind.Peer -> {
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("What kind of peer support? (optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
         Spacer(Modifier.height(16.dp))
         Button(
@@ -113,7 +126,7 @@ fun ConnectedRequestScreen(
                                 "pickup_label" to pickup.trim(),
                                 "destination_label" to destination.trim(),
                             )
-                            SupportKind.Food, SupportKind.Shelter ->
+                            SupportKind.Food, SupportKind.Shelter, SupportKind.Peer ->
                                 if (note.isBlank()) emptyMap()
                                 else mapOf("note" to note.trim())
                         }
