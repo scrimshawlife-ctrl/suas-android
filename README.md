@@ -45,10 +45,10 @@ Synthetic staging is [https://suasqrf.com](https://suasqrf.com). Use it only for
 
 This tree is a Kotlin Jetpack Compose client. It is a fork of [RuntimeSquad/Suas](https://github.com/RuntimeSquad/Suas). Observed today:
 
-- Launcher activity is `RootActivity` (email sign-in, then ride / food / shelter).
-- `com.example.suas.api` holds Retrofit `SuasApi`, `SessionStore` (memory only), and submit helpers for transportation, food, and shelter after a signed-in Case open.
+- Launcher activity is `RootActivity` (email sign-in, then ride / food / shelter / peer support).
+- `com.example.suas.api` holds Retrofit `SuasApi`, `SessionStore` (memory only), and submit helpers for transportation, food, shelter, and peer support after a signed-in Case open.
 - Package and application ID remain `com.example.suas`.
-- Peer support is **not** on the launcher home cards yet (see specs `GAP_ANALYSIS.md`).
+- All four MVP categories are on the launcher home cards.
 - `MainActivity` remains as a dummy form for instrumented tests. It is not the product launcher and must not imply live fulfillment.
 - Chat and dashboard-style totals stay unavailable / not computable. Do not print “dispatched now” or lives-saved numbers.
 - JVM tests cover the API contract baseline. Instrumented Compose tests still exercise the dummy home.
