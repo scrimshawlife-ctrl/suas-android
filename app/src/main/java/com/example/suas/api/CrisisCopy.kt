@@ -23,6 +23,8 @@ object CrisisCopy {
 }
 
 object ListAccess {
+    /** One catalog page. The client does not follow next_cursor. */
+    const val SHELTER_PREVIEW_LIMIT = 1
     const val FOLLOWS_NEXT_CURSOR = false
 }
 

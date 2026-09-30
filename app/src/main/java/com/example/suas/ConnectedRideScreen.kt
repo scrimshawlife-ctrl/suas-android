@@ -97,12 +97,13 @@ fun ConnectedRideScreen(
                             idempotencyKey = keys.submitKey,
                             id = created.serviceRequestId,
                             command = "SUBMIT",
+                            body = emptyMap(),
                         )
                         attempt.finish(AttemptOutcome.SUCCESS)
                         message = "Request ${submitted.serviceRequestId} is ${submitted.status}. Not a booked ride."
                     } catch (e: Exception) {
                         attempt.finish(classifyAttempt(e))
-                        message = e.message ?: "Request failed. The same request can be tried again."
+                        message = "Request failed. The same request can be tried again."
                     } finally {
                         busy = false
                     }

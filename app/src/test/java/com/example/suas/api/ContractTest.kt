@@ -8,6 +8,7 @@ import org.junit.Test
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 import java.lang.reflect.Method
 
 class ContractTest {
@@ -115,7 +116,69 @@ class ContractTest {
     fun backupIsExplicitlyOffAndHistoryIsNotWalked() {
         assertFalse(BackupPolicy.ALLOW_BACKUP)
         assertFalse(ListAccess.FOLLOWS_NEXT_CURSOR)
+        assertEquals(1, ListAccess.SHELTER_PREVIEW_LIMIT)
         assertEquals("PLACEHOLDER_NOT_RELEASED", ClientPins.APPLICATION_ID_STATUS)
+    }
+
+    @Test
+    fun shelterPreviewUsesTheFirstNameAndDropsTheCursor() {
+        val page = ResourcePage(
+            resources = listOf(
+                ResourceDto(serviceName = "Harbor House"),
+                ResourceDto(serviceName = "Second listing"),
+            ),
+            limit = 1,
+            nextCursor = "page-2",
+        )
+        assertEquals("Harbor House", previewShelterName(page))
+        assertFalse(RequestStatusRules.canConfirm("SUBMITTED"))
+        assertTrue(RequestStatusRules.canConfirm("FULFILLED"))
+        assertTrue(RequestStatusRules.canCancel("SUBMITTED"))
+        assertFalse(RequestStatusRules.canCancel("CANCELLED"))
+        assertEquals(VeteranCommands.CANCEL_REASON, "Cancelled by veteran from the SUAS app.")
+    }
+
+    @Test
+    fun unauthorizedClearsTheBearerAndReusesTheSubmitKey() {
+        val session = SessionStore()
+        session.put("tok")
+        var n = 0
+        val attempt = SubmissionAttempt { "k${n++}" }
+        val first = attempt.current()
+        assertTrue(clearSessionOnUnauthorized(401, session))
+        attempt.finish(outcomeForHttp(401))
+        assertEquals(null, session.authorizationHeader())
+        assertEquals(first, attempt.current())
+        assertFalse(clearSessionOnUnauthorized(409, session))
+    }
+
+    @Test
+    fun consentReadUsesOnlyTheLatestActiveGrant() {
+        val active = ConsentGrantDto(
+            permission = "can_share",
+            scope = "service_request_fulfillment",
+            status = "ACTIVE",
+            granteeId = "provider-1",
+        )
+        val revoked = active.copy(status = "REVOKED")
+        assertTrue(disclosureAllowed(listOf(active), "can_share", "service_request_fulfillment", "provider-1"))
+        assertFalse(disclosureAllowed(listOf(revoked), "can_share", "service_request_fulfillment", "provider-1"))
+        assertFalse(disclosureAllowed(emptyList(), "can_share", "service_request_fulfillment", "provider-1"))
+        val firstRead = ConsentListDto(listOf(active))
+        val secondRead = ConsentListDto(listOf(revoked))
+        assertTrue(disclosureAllowed(firstRead, "can_share", "service_request_fulfillment", "provider-1"))
+        assertFalse(disclosureAllowed(secondRead, "can_share", "service_request_fulfillment", "provider-1"))
+    }
+
+    @Test
+    fun resourcesAskForOnePageAndDoNotSendACursor() {
+        val resources = SuasApi::class.java.methods.first { it.name == "resources" }
+        val queries = queryNames(resources)
+        assertTrue(queries.contains("limit"))
+        assertTrue(queries.contains("category"))
+        assertFalse(queries.contains("cursor"))
+        val consents = SuasApi::class.java.methods.first { it.name == "consents" }
+        assertEquals("/api/v0/consents", pathOf(consents))
     }
 
     @Test
@@ -137,6 +200,12 @@ class ContractTest {
         method.getAnnotation(POST::class.java)?.let { return it.value }
         method.getAnnotation(GET::class.java)?.let { return it.value }
         return null
+    }
+
+    private fun queryNames(method: Method): Set<String> {
+        return method.parameterAnnotations.flatMap { annotations ->
+            annotations.mapNotNull { if (it is Query) it.value else null }
+        }.toSet()
     }
 
     private fun hasIdempotencyHeader(method: Method): Boolean {

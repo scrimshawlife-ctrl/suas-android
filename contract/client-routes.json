@@ -1,0 +1,15 @@
+{
+  "source": "scrimshawlife-ctrl/suas docs/openapi/v0.json",
+  "spec": "0.6.0",
+  "routes": [
+    {"method": "POST", "path": "/api/v0/auth/challenges", "idempotency": false},
+    {"method": "POST", "path": "/api/v0/auth/challenges/commands/verify", "idempotency": false},
+    {"method": "POST", "path": "/api/v0/auth/sessions/commands/logout", "idempotency": false},
+    {"method": "GET", "path": "/api/v0/veterans/me", "idempotency": false},
+    {"method": "POST", "path": "/api/v0/cases", "idempotency": true},
+    {"method": "POST", "path": "/api/v0/cases/{caseId}/service-requests", "idempotency": true},
+    {"method": "POST", "path": "/api/v0/service-requests/{id}/commands/{command}", "idempotency": true},
+    {"method": "GET", "path": "/api/v0/resources", "idempotency": false},
+    {"method": "GET", "path": "/api/v0/consents", "idempotency": false}
+  ]
+}

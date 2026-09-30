@@ -8,14 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.suas.api.BuildInfo
 import com.example.suas.api.ClientConfiguration
 import com.example.suas.api.ClientPins
 import com.example.suas.api.ConfigurationDecision
-import com.example.suas.api.SessionStore
 import com.example.suas.api.SuasClient
+import com.example.suas.api.signOut
 import com.example.suas.ui.theme.SuasTheme
+import kotlinx.coroutines.launch
 
 private enum class RootScreen {
     Home,
@@ -54,13 +56,25 @@ class RootActivity : ComponentActivity() {
 @Composable
 private fun ProductShell() {
     var screen by remember { mutableStateOf(RootScreen.Home) }
-    val session = remember { SessionStore() }
+    val memory = remember { RequestMemory() }
     val api = remember { SuasClient.create() }
+    val scope = rememberCoroutineScope()
+    val sessionRejected = {
+        memory.signedIn = false
+        screen = RootScreen.SignIn
+    }
 
     when (screen) {
         RootScreen.Home -> LauncherHome(
-            signedIn = session.bearer != null,
+            signedIn = memory.signedIn,
             onSignIn = { screen = RootScreen.SignIn },
+            onSignOut = {
+                scope.launch {
+                    signOut(api, memory.session)
+                    memory.active = null
+                    memory.signedIn = false
+                }
+            },
             onRide = { screen = RootScreen.Ride },
             onFood = { screen = RootScreen.Food },
             onShelter = { screen = RootScreen.Shelter },
@@ -68,36 +82,39 @@ private fun ProductShell() {
         )
         RootScreen.SignIn -> SignInScreen(
             api = api,
-            session = session,
-            onSignedIn = { screen = RootScreen.Home },
+            session = memory.session,
+            onSignedIn = {
+                memory.signedIn = true
+                screen = RootScreen.Home
+            },
             onBack = { screen = RootScreen.Home },
         )
         RootScreen.Ride -> ConnectedRequestScreen(
             kind = SupportKind.Ride,
             api = api,
-            session = session,
-            onNeedSignIn = { screen = RootScreen.SignIn },
+            memory = memory,
+            onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
         RootScreen.Food -> ConnectedRequestScreen(
             kind = SupportKind.Food,
             api = api,
-            session = session,
-            onNeedSignIn = { screen = RootScreen.SignIn },
+            memory = memory,
+            onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
         RootScreen.Shelter -> ConnectedRequestScreen(
             kind = SupportKind.Shelter,
             api = api,
-            session = session,
-            onNeedSignIn = { screen = RootScreen.SignIn },
+            memory = memory,
+            onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
         RootScreen.Peer -> ConnectedRequestScreen(
             kind = SupportKind.Peer,
             api = api,
-            session = session,
-            onNeedSignIn = { screen = RootScreen.SignIn },
+            memory = memory,
+            onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
     }

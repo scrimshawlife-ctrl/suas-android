@@ -36,6 +36,7 @@ import com.example.suas.ui.theme.ShelterPurpleText
 fun LauncherHome(
     signedIn: Boolean,
     onSignIn: () -> Unit,
+    onSignOut: () -> Unit,
     onRide: () -> Unit,
     onFood: () -> Unit,
     onShelter: () -> Unit,
@@ -52,8 +53,11 @@ fun LauncherHome(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(24.dp))
-            TextButton(onClick = onSignIn, modifier = Modifier.fillMaxWidth()) {
-                Text(if (signedIn) "Signed in" else "Sign in")
+            TextButton(
+                onClick = { if (signedIn) onSignOut() else onSignIn() },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(if (signedIn) "Sign out" else "Sign in")
             }
             Text(
                 text = "S.U.A.S.",

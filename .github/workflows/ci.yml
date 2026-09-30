@@ -27,6 +27,10 @@ jobs:
           java-version: 17
       - name: Forbidden capabilities
         run: bash scripts/forbidden-capabilities.sh
+      - name: OpenAPI client pin
+        run: |
+          curl -fsSL -o /tmp/v0.json https://raw.githubusercontent.com/scrimshawlife-ctrl/suas/main/docs/openapi/v0.json
+          python3 scripts/openapi-client-pin.py /tmp/v0.json
       - name: Unit tests, lint, and release artifact
         run: |
           chmod +x ./gradlew
