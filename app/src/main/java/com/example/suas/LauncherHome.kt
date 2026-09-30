@@ -56,7 +56,7 @@ fun LauncherHome(
                 Text(if (signedIn) "Signed in" else "Sign in")
             }
             Text(
-                text = "S.U.A.S. Veteran Crisis Q.R.F.",
+                text = "S.U.A.S.",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -99,6 +99,19 @@ fun LauncherHome(
                 onClick = onPeer,
             )
             Spacer(Modifier.height(28.dp))
+            CrisisNotice()
+            Spacer(Modifier.height(12.dp))
+            BuildInfoBlock(
+                com.example.suas.api.BuildInfo(
+                    appVersion = com.example.suas.api.ClientPins.APPLICATION_VERSION,
+                    commit = com.example.suas.api.ClientPins.COMMIT,
+                    specVersion = com.example.suas.api.ClientPins.SPEC_VERSION,
+                    manifest = com.example.suas.api.ClientPins.RELEASE_MANIFEST,
+                    buildTimestamp = com.example.suas.api.ClientPins.BUILD_TIMESTAMP,
+                    environmentClass = com.example.suas.api.ClientPins.ENVIRONMENT_CLASS,
+                ),
+            )
+            Spacer(Modifier.height(12.dp))
             Text(
                 text = "SUAS coordinates practical support. It is not an emergency service.",
                 color = FooterTextGrey,

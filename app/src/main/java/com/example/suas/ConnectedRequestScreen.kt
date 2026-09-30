@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.suas.api.Categories
 import com.example.suas.api.CreateServiceRequestBody
+import com.example.suas.api.AttemptOutcome
 import com.example.suas.api.SessionStore
+import com.example.suas.api.SubmissionAttempt
 import com.example.suas.api.SuasApi
-import com.example.suas.api.newIdempotencyKey
+import com.example.suas.api.classifyAttempt
 import kotlinx.coroutines.launch
 
 enum class SupportKind(
@@ -66,6 +68,7 @@ fun ConnectedRequestScreen(
     var note by remember { mutableStateOf("") }
     var message by remember { mutableStateOf(kind.disclaimer) }
     var busy by remember { mutableStateOf(false) }
+    val attempt = remember { SubmissionAttempt() }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -119,8 +122,9 @@ fun ConnectedRequestScreen(
                 }
                 scope.launch {
                     busy = true
+                    val keys = attempt.current()
                     try {
-                        val opened = api.openCase(auth, newIdempotencyKey())
+                        val opened = api.openCase(auth, keys.openCaseKey)
                         val details = when (kind) {
                             SupportKind.Ride -> mapOf(
                                 "pickup_label" to pickup.trim(),
@@ -132,7 +136,7 @@ fun ConnectedRequestScreen(
                         }
                         val created = api.createServiceRequest(
                             authorization = auth,
-                            idempotencyKey = newIdempotencyKey(),
+                            idempotencyKey = keys.createKey,
                             caseId = opened.caseId,
                             body = CreateServiceRequestBody(
                                 category = kind.category,
@@ -141,13 +145,15 @@ fun ConnectedRequestScreen(
                         )
                         val submitted = api.command(
                             authorization = auth,
-                            idempotencyKey = newIdempotencyKey(),
+                            idempotencyKey = keys.submitKey,
                             id = created.serviceRequestId,
                             command = "SUBMIT",
                         )
+                        attempt.finish(AttemptOutcome.SUCCESS)
                         message = "Request ${submitted.serviceRequestId} is ${submitted.status}. ${kind.disclaimer}"
                     } catch (e: Exception) {
-                        message = e.message ?: "Request failed."
+                        attempt.finish(classifyAttempt(e))
+                        message = e.message ?: "Request failed. The same request can be tried again."
                     } finally {
                         busy = false
                     }

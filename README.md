@@ -47,9 +47,9 @@ This tree is a Kotlin Jetpack Compose client. It is a fork of [RuntimeSquad/Suas
 
 - Launcher activity is `RootActivity` (email sign-in, then ride / food / shelter / peer support).
 - `com.example.suas.api` holds Retrofit `SuasApi`, `SessionStore` (memory only), and submit helpers for transportation, food, shelter, and peer support after a signed-in Case open.
-- Package and application ID remain `com.example.suas`.
+- Package and application ID remain `com.example.suas`. That identifier is a placeholder. Specs do not name a production application ID, so this tree does not invent one.
 - All four MVP categories are on the launcher home cards.
-- `MainActivity` remains as a dummy form for instrumented tests. It is not the product launcher and must not imply live fulfillment. The screen labels itself as a test harness.
+- `MainActivity` is a debug-only test harness. It is not in the release manifest and it is not exported. The product launcher is `RootActivity`.
 - Chat and dashboard-style totals stay unavailable / not computable. Do not print “dispatched now” or lives-saved numbers.
 - JVM tests cover the API contract baseline. Instrumented Compose tests still exercise the dummy home.
 

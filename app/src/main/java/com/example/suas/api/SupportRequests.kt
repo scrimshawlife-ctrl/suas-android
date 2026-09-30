@@ -1,7 +1,6 @@
 package com.example.suas.api
 
 import com.google.gson.annotations.SerializedName
-import java.util.UUID
 
 data class CreateServiceRequestBody(
     val category: String,
@@ -22,4 +21,3 @@ object Categories {
     const val PEER_SUPPORT = "PEER_SUPPORT"
 }
 
-fun newIdempotencyKey(): String = UUID.randomUUID().toString()

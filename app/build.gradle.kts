@@ -10,9 +10,12 @@ android {
     }
 
     defaultConfig {
+        // PLACEHOLDER_NOT_RELEASED. SUAS-specs does not name a production applicationId.
+        // Do not invent one. Store distribution remains prohibited.
         applicationId = "com.example.suas"
         minSdk = 24
         targetSdk = 37
+        // Application version, not the spec stack (0.6.0) and not an API version.
         versionCode = 1
         versionName = "1.0"
 
@@ -21,8 +24,12 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
+            // CI can assemble an artifact. The debug keystore is generated on the
+            // builder and is not a store credential. Store signing is operator-owned.
+            signingConfig = signingConfigs.getByName("debug")
             optimization {
-                enable = false
+                enable = true
             }
         }
     }

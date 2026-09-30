@@ -2,7 +2,7 @@ package com.example.suas.api
 
 /**
  * In-process session only (D-034 still open).
- * Do not write the bearer to SharedPreferences or a file.
+ * Do not write the bearer to a preference store or a file.
  */
 class SessionStore {
     @Volatile
