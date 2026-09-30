@@ -1,0 +1,44 @@
+# Android hygiene CI. SPEC-018 remains KEEP_BLOCKED.
+# Emulator/instrumented acceptance is not claimed here.
+# DEVICE_ACCEPTANCE_REQUIRED remains for on-device checks.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Forbidden capabilities
+        run: bash scripts/forbidden-capabilities.sh
+      - name: OpenAPI client pin
+        run: |
+          curl -fsSL -o /tmp/v0.json https://raw.githubusercontent.com/scrimshawlife-ctrl/suas/main/docs/openapi/v0.json
+          python3 scripts/openapi-client-pin.py /tmp/v0.json
+      - name: Unit tests, lint, and release artifact
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease --stacktrace
+      - name: Upload release artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: ignore

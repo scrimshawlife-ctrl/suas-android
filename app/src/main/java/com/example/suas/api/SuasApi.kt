@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface SuasApi {
     @POST("/api/v0/auth/challenges")
@@ -40,5 +41,18 @@ interface SuasApi {
         @Header("Idempotency-Key") idempotencyKey: String,
         @Path("id") id: String,
         @Path("command") command: String,
+        @Body body: Map<String, String>,
     ): ServiceRequestDto
+
+    @GET("/api/v0/resources")
+    suspend fun resources(
+        @Header("Authorization") authorization: String,
+        @Query("category") category: String,
+        @Query("limit") limit: Int,
+    ): ResourcePage
+
+    @GET("/api/v0/consents")
+    suspend fun consents(
+        @Header("Authorization") authorization: String,
+    ): ConsentListDto
 }

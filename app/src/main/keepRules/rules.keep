@@ -1,3 +1,11 @@
+# Retrofit and Gson models. Do not keep credentials; there are none in source.
+-keepattributes Signature, InnerClasses, EnclosingMethod, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn retrofit2.**
+-keep class com.example.suas.api.** { *; }
+
 # Add project specific R8 rules here.
 # AGP will combine all keep rule files in src/main/keepRules to pass to R8
 #

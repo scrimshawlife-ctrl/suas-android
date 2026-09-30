@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.suas.api.Categories
 import com.example.suas.api.CreateServiceRequestBody
+import com.example.suas.api.AttemptOutcome
 import com.example.suas.api.SessionStore
+import com.example.suas.api.SubmissionAttempt
 import com.example.suas.api.SuasApi
-import com.example.suas.api.newIdempotencyKey
+import com.example.suas.api.classifyAttempt
 import kotlinx.coroutines.launch
 
 /**
@@ -41,6 +43,7 @@ fun ConnectedRideScreen(
     var destination by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("Availability is confirmed by the support team. This does not book a ride.") }
     var busy by remember { mutableStateOf(false) }
+    val attempt = remember { SubmissionAttempt() }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -74,11 +77,12 @@ fun ConnectedRideScreen(
                 }
                 scope.launch {
                     busy = true
+                    val keys = attempt.current(listOf(pickup.trim(), destination.trim()).joinToString("|"))
                     try {
-                        val opened = api.openCase(auth, newIdempotencyKey())
+                        val opened = api.openCase(auth, keys.openCaseKey)
                         val created = api.createServiceRequest(
                             authorization = auth,
-                            idempotencyKey = newIdempotencyKey(),
+                            idempotencyKey = keys.createKey,
                             caseId = opened.caseId,
                             body = CreateServiceRequestBody(
                                 category = Categories.TRANSPORTATION,
@@ -90,13 +94,16 @@ fun ConnectedRideScreen(
                         )
                         val submitted = api.command(
                             authorization = auth,
-                            idempotencyKey = newIdempotencyKey(),
+                            idempotencyKey = keys.submitKey,
                             id = created.serviceRequestId,
                             command = "SUBMIT",
+                            body = emptyMap(),
                         )
+                        attempt.finish(AttemptOutcome.SUCCESS)
                         message = "Request ${submitted.serviceRequestId} is ${submitted.status}. Not a booked ride."
                     } catch (e: Exception) {
-                        message = e.message ?: "Request failed."
+                        attempt.finish(classifyAttempt(e))
+                        message = "Request failed. The same request can be tried again."
                     } finally {
                         busy = false
                     }

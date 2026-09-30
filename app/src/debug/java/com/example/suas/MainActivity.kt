@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -524,60 +522,6 @@ fun RideRequestScreen(onBack: () -> Unit) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ServiceCard(
-    icon: String,
-    title: String,
-    subtitle: String,
-    backgroundColor: Color,
-    textColor: Color,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(2.dp, textColor, RoundedCornerShape(20.dp))
-            .clickable(
-                onClick = onClick,
-                role = Role.Button
-            ),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        shape = RoundedCornerShape(20.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 20.dp)
-                .semantics(mergeDescendants = true) {},
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier.size(56.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = icon,
-                    fontSize = 44.sp
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = title,
-                    color = textColor,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = subtitle,
-                    color = Color.Gray,
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
                 )
             }
         }
