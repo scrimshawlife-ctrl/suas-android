@@ -6,7 +6,8 @@ import retrofit2.HttpException
 
 /**
  * One logical submission owns three keys: open case, create, and submit.
- * Transport ambiguity reuses them. A completed action mints new keys.
+ * The same payload signature reuses them after an ambiguous failure.
+ * A different signature, or a completed action, mints new keys.
  * MOBILE_SURFACE.md §4.4. D-022 is unrelated; this is the command key.
  */
 data class SubmissionKeys(
@@ -26,17 +27,22 @@ class SubmissionAttempt(
     private val mint: () -> String = { UUID.randomUUID().toString() },
 ) {
     private var keys: SubmissionKeys? = null
+    private var signature: String? = null
 
-    fun current(): SubmissionKeys {
+    fun current(payloadSignature: String): SubmissionKeys {
         val existing = keys
-        if (existing != null) return existing
+        if (existing != null && signature == payloadSignature) return existing
         val created = SubmissionKeys(mint(), mint(), mint())
         keys = created
+        signature = payloadSignature
         return created
     }
 
     fun finish(outcome: AttemptOutcome) {
-        if (!outcome.reuseKey) keys = null
+        if (!outcome.reuseKey) {
+            keys = null
+            signature = null
+        }
     }
 }
 

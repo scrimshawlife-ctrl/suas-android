@@ -3,6 +3,8 @@ package com.example.suas.api
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.http.GET
@@ -12,6 +14,14 @@ import retrofit2.http.Query
 import java.lang.reflect.Method
 
 class ContractTest {
+    @Test
+    fun localBaseNeedsAnExplicitLocalClass() {
+        assertThrows(IllegalStateException::class.java) {
+            SuasClient.create(baseUrl = Backend.LOCAL_BASE)
+        }
+        assertNotNull(SuasClient.create(baseUrl = Backend.LOCAL_BASE, environmentClass = "LOCAL"))
+    }
+
     @Test
     fun shippedStagingIsAccepted() {
         val decision = ClientConfiguration.validate()
@@ -74,17 +84,19 @@ class ContractTest {
     fun retryReusesKeysAndSuccessMintsANewAction() {
         var n = 0
         val attempt = SubmissionAttempt { "k${n++}" }
-        val first = attempt.current()
+        val first = attempt.current("ride|a|b")
         assertEquals("k0", first.openCaseKey)
         assertEquals("k1", first.createKey)
         assertEquals("k2", first.submitKey)
         attempt.finish(AttemptOutcome.AMBIGUOUS)
-        assertEquals(first, attempt.current())
+        assertEquals(first, attempt.current("ride|a|b"))
         attempt.finish(AttemptOutcome.RETRYABLE_HTTP)
-        assertEquals(first, attempt.current())
+        assertEquals(first, attempt.current("ride|a|b"))
+        val changed = attempt.current("ride|a|c")
+        assertNotEquals(first.openCaseKey, changed.openCaseKey)
         attempt.finish(AttemptOutcome.SUCCESS)
-        val second = attempt.current()
-        assertNotEquals(first.openCaseKey, second.openCaseKey)
+        val second = attempt.current("ride|a|c")
+        assertNotEquals(changed.openCaseKey, second.openCaseKey)
     }
 
     @Test
@@ -144,11 +156,11 @@ class ContractTest {
         session.put("tok")
         var n = 0
         val attempt = SubmissionAttempt { "k${n++}" }
-        val first = attempt.current()
+        val first = attempt.current("same")
         assertTrue(clearSessionOnUnauthorized(401, session))
         attempt.finish(outcomeForHttp(401))
         assertEquals(null, session.authorizationHeader())
-        assertEquals(first, attempt.current())
+        assertEquals(first, attempt.current("same"))
         assertFalse(clearSessionOnUnauthorized(409, session))
     }
 

@@ -175,7 +175,7 @@ fun ConnectedRequestScreen(
                 }
                 scope.launch {
                     busy = true
-                    val keys = memory.submitAttempt.current()
+                    val keys = memory.submitAttempt.current(payloadSignature(kind, pickup, destination, note))
                     try {
                         val opened = api.openCase(auth, keys.openCaseKey)
                         val details = when (kind) {
@@ -266,6 +266,17 @@ fun ConnectedRequestScreen(
         Spacer(Modifier.height(12.dp))
         Text(message, fontSize = 14.sp)
     }
+}
+
+private fun payloadSignature(
+    kind: SupportKind,
+    pickup: String,
+    destination: String,
+    note: String,
+): String = when (kind) {
+    SupportKind.Ride -> listOf(kind.category, pickup.trim(), destination.trim()).joinToString("|")
+    SupportKind.Food, SupportKind.Shelter, SupportKind.Peer ->
+        listOf(kind.category, note.trim()).joinToString("|")
 }
 
 private fun statusLine(status: String, shelterName: String?, disclaimer: String): String {

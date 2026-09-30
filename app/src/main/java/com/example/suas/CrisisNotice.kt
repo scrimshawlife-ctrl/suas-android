@@ -1,5 +1,6 @@
 package com.example.suas
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,15 @@ import com.example.suas.api.CrisisCopy
 fun CrisisNotice() {
     val context = LocalContext.current
     var choosing988 by remember { mutableStateOf(false) }
+    var handoff by remember { mutableStateOf<String?>(null) }
+    fun openExternal(action: String, uri: String) {
+        try {
+            context.startActivity(Intent(action, Uri.parse(uri)))
+            handoff = null
+        } catch (_: ActivityNotFoundException) {
+            handoff = "This device did not open a dialer or messages app. The instructions above still apply."
+        }
+    }
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(CrisisCopy.ENTRY_HEADING, modifier = Modifier.semantics { heading() })
         Text(CrisisCopy.IMMEDIATE_DANGER)
@@ -36,12 +46,14 @@ fun CrisisNotice() {
         Text(CrisisCopy.LIFELINE)
         Text(CrisisCopy.VETERANS_CRISIS_LINE)
         Button(
-            onClick = {
-                context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse(CrisisCopy.CALL_911)))
-            },
+            onClick = { openExternal(Intent.ACTION_DIAL, CrisisCopy.CALL_911) },
             modifier = Modifier.heightIn(min = 48.dp),
         ) {
             Text(CrisisCopy.ACTION_911)
+        }
+        val notice = handoff
+        if (notice != null) {
+            Text(notice)
         }
         Button(
             onClick = { choosing988 = true },
@@ -59,7 +71,7 @@ fun CrisisNotice() {
                 TextButton(
                     onClick = {
                         choosing988 = false
-                        context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse(CrisisCopy.CALL_988)))
+                        openExternal(Intent.ACTION_DIAL, CrisisCopy.CALL_988)
                     },
                 ) { Text("Call 988") }
             },
@@ -67,7 +79,7 @@ fun CrisisNotice() {
                 TextButton(
                     onClick = {
                         choosing988 = false
-                        context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse(CrisisCopy.TEXT_988)))
+                        openExternal(Intent.ACTION_SENDTO, CrisisCopy.TEXT_988)
                     },
                 ) { Text("Text 988") }
             },

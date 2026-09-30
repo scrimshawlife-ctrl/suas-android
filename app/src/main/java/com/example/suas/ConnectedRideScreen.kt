@@ -77,7 +77,7 @@ fun ConnectedRideScreen(
                 }
                 scope.launch {
                     busy = true
-                    val keys = attempt.current()
+                    val keys = attempt.current(listOf(pickup.trim(), destination.trim()).joinToString("|"))
                     try {
                         val opened = api.openCase(auth, keys.openCaseKey)
                         val created = api.createServiceRequest(
