@@ -110,12 +110,12 @@ export ANDROID_HOME=/path/to/android-sdk
 adb shell am start -n com.example.suas/.DemoRootActivity
 ```
 
-Sign in with `veteran@example.invalid` and code `246810` (shown on the sign-in
+Sign in with `demo@example.invalid` and code `123456` (shown on the sign-in
 screen). Each request screen opens with the seeded request for that category
 (Transportation MATCHING, Food FULFILLED and ready to confirm, Shelter
 CANCELLED, Peer Support CREATED); a new request can be submitted, advanced with
-the demo button, confirmed, or cancelled. `veteran3@example.invalid` has no case
-yet. State lives in memory only and resets when the process ends (D-034).
+the demo button, confirmed, or cancelled. `newvet@example.invalid` (same code)
+has no case yet. State lives in memory only and resets when the process ends (D-034).
 
 `DemoSuasApi` loads `app/src/debug/resources/demo/demo-fixtures.json`, a copy of
 `contract/demo-fixtures.json`. That file is captured from the real LOCAL Worker
@@ -141,11 +141,14 @@ adb shell am start -n com.example.suas/.LocalRootActivity
 
 The emulator reaches the host at `http://10.0.2.2:3000` (cleartext is allowed
 only for `localhost`, `127.0.0.1`, and `10.0.2.2` by
-`network_security_config.xml`). After tapping "Send sign-in code", read the
-one-time code on the host, because the app never calls `/api/v0/dev/*`:
+`network_security_config.xml`). Sign in with `demo@example.invalid` (prefilled)
+and code `123456`: the LOCAL demo Worker issues that fixed code to this one
+account only (`SUAS_DEMO_FIXED_CODE=enabled`, set by `npm run dev:demo`; the
+Worker refuses it outside LOCAL). For any other account, read the one-time code
+on the host, because the app never calls `/api/v0/dev/*`:
 
 ```bash
-curl "http://127.0.0.1:3000/api/v0/dev/last-challenge?destination=veteran@example.invalid"
+curl "http://127.0.0.1:3000/api/v0/dev/last-challenge?destination=newvet@example.invalid"
 ```
 
 ### Checks

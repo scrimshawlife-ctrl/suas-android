@@ -13,7 +13,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 private const val TENANT_ID = "00000000-0000-4000-8000-000000000001"
-private const val PRIMARY_EMAIL = "veteran@example.invalid"
+private const val PRIMARY_EMAIL = "demo@example.invalid"
 
 /**
  * Runs a suspend block to completion on the calling thread.

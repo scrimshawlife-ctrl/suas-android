@@ -50,9 +50,9 @@ class LocalRootActivity : ComponentActivity() {
                                 ShellHooks(
                                     environmentClass = LOCAL_CLASS,
                                     banner = "LOCAL Worker at ${Backend.LOCAL_BASE}. Synthetic demo data.",
-                                    signInHint = "Demo email veteran@example.invalid. The one-time code comes " +
-                                        "from the host terminal (see README, Demo modes).",
-                                    prefillEmail = "veteran@example.invalid",
+                                    signInHint = "Demo sign-in: demo@example.invalid, code 123456 " +
+                                        "(LOCAL demo Worker only).",
+                                    prefillEmail = "demo@example.invalid",
                                 )
                             },
                         )

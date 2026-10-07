@@ -28,12 +28,12 @@ class DemoFixturesAndAuthTest {
     @Test
     fun fixturesLoadFromTheClasspathWithExpectedTenantCodeAndVeterans() {
         assertEquals("00000000-0000-4000-8000-000000000001", fixtures.tenantId)
-        assertEquals("246810", fixtures.demoCode)
+        assertEquals("123456", fixtures.demoCode)
         assertEquals(2, fixtures.veterans.size)
 
         val emails = fixtures.veterans.map { it.email }
         assertTrue(emails.contains(PRIMARY_EMAIL))
-        assertTrue(emails.contains(THIRD_EMAIL))
+        assertTrue(emails.contains(NEWVET_EMAIL))
         for (email in emails) {
             assertTrue("unexpected veteran address $email", email.endsWith("@example.invalid"))
         }
@@ -168,7 +168,7 @@ class DemoFixturesAndAuthTest {
         val primaryMe = runSuspend { api.me(signIn(api, PRIMARY_EMAIL)) }
         assertNotNull(primaryMe.openCase)
 
-        val thirdMe = runSuspend { api.me(signIn(api, THIRD_EMAIL)) }
+        val thirdMe = runSuspend { api.me(signIn(api, NEWVET_EMAIL)) }
         assertNull(thirdMe.openCase)
     }
 
@@ -196,7 +196,7 @@ class DemoFixturesAndAuthTest {
     @Test
     fun openCaseCreatesACaseForAVeteranWithoutOneAndReusesItLater() {
         val api = newApi()
-        val auth = signIn(api, THIRD_EMAIL)
+        val auth = signIn(api, NEWVET_EMAIL)
 
         val created = runSuspend { api.openCase(auth, "test-create-key-1") }
         assertEquals(true, created.created)
@@ -239,8 +239,8 @@ class DemoFixturesAndAuthTest {
             .use { it.bufferedReader(Charsets.UTF_8).readText() }
 
     private companion object {
-        const val PRIMARY_EMAIL = "veteran@example.invalid"
-        const val THIRD_EMAIL = "veteran3@example.invalid"
+        const val PRIMARY_EMAIL = "demo@example.invalid"
+        const val NEWVET_EMAIL = "newvet@example.invalid"
 
         val ALL_CATEGORIES = listOf(
             Categories.TRANSPORTATION,
