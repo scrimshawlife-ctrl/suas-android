@@ -11,6 +11,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,7 @@ fun ConnectedRequestScreen(
     memory: RequestMemory,
     onNeedSignIn: () -> Unit,
     onBack: () -> Unit,
+    hooks: ShellHooks = ShellHooks.NONE,
 ) {
     var pickup by remember { mutableStateOf("") }
     var destination by remember { mutableStateOf("") }
@@ -76,6 +78,15 @@ fun ConnectedRequestScreen(
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val active = memory.active?.takeIf { it.category == kind.category }
+
+    LaunchedEffect(kind) {
+        val lookup = hooks.existingRequest ?: return@LaunchedEffect
+        val auth = memory.session.authorizationHeader() ?: return@LaunchedEffect
+        if (memory.active?.category == kind.category) return@LaunchedEffect
+        val existing = lookup(auth, kind.category) ?: return@LaunchedEffect
+        memory.active = existing
+        message = statusLine(existing.status, existing.shelterName, kind.disclaimer)
+    }
 
     fun fail(error: Exception, reuse: () -> Unit) {
         val outcome = classifyAttempt(error)
@@ -241,6 +252,20 @@ fun ConnectedRequestScreen(
             },
         ) {
             Text("Submit request")
+        }
+        val advance = hooks.advance
+        if (active != null && advance != null) {
+            Spacer(Modifier.height(8.dp))
+            TextButton(
+                enabled = !busy,
+                onClick = {
+                    val next = advance(active.id)
+                    if (next != null) {
+                        memory.active = active.copy(status = next)
+                        message = statusLine(next, active.shelterName, kind.disclaimer)
+                    }
+                },
+            ) { Text("Demo only: advance status (${active.status})") }
         }
         if (active != null && RequestStatusRules.canConfirm(active.status)) {
             Spacer(Modifier.height(8.dp))

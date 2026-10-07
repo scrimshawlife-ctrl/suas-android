@@ -14,6 +14,7 @@ import com.example.suas.api.BuildInfo
 import com.example.suas.api.ClientConfiguration
 import com.example.suas.api.ClientPins
 import com.example.suas.api.ConfigurationDecision
+import com.example.suas.api.SuasApi
 import com.example.suas.api.SuasClient
 import com.example.suas.api.signOut
 import com.example.suas.ui.theme.SuasTheme
@@ -46,18 +47,24 @@ class RootActivity : ComponentActivity() {
                             environmentClass = ClientPins.ENVIRONMENT_CLASS,
                         ),
                     )
-                    is ConfigurationDecision.Accepted -> ProductShell()
+                    is ConfigurationDecision.Accepted -> SuasProductShell()
                 }
             }
         }
     }
 }
 
+/**
+ * The one product shell. RootActivity passes the pinned staging client and [ShellHooks.NONE].
+ * Debug-only launchers pass a LOCAL client or the in-memory demo client plus demo hooks.
+ */
 @Composable
-private fun ProductShell() {
+internal fun SuasProductShell(
+    api: SuasApi = remember { SuasClient.create() },
+    hooks: ShellHooks = ShellHooks.NONE,
+) {
     var screen by remember { mutableStateOf(RootScreen.Home) }
     val memory = remember { RequestMemory() }
-    val api = remember { SuasClient.create() }
     val scope = rememberCoroutineScope()
     val sessionRejected = {
         memory.signedIn = false
@@ -67,6 +74,8 @@ private fun ProductShell() {
     when (screen) {
         RootScreen.Home -> LauncherHome(
             signedIn = memory.signedIn,
+            environmentClass = hooks.environmentClass,
+            banner = hooks.banner,
             onSignIn = { screen = RootScreen.SignIn },
             onSignOut = {
                 scope.launch {
@@ -83,6 +92,8 @@ private fun ProductShell() {
         RootScreen.SignIn -> SignInScreen(
             api = api,
             session = memory.session,
+            hint = hooks.signInHint,
+            prefillEmail = hooks.prefillEmail,
             onSignedIn = {
                 memory.signedIn = true
                 screen = RootScreen.Home
@@ -93,6 +104,7 @@ private fun ProductShell() {
             kind = SupportKind.Ride,
             api = api,
             memory = memory,
+            hooks = hooks,
             onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
@@ -100,6 +112,7 @@ private fun ProductShell() {
             kind = SupportKind.Food,
             api = api,
             memory = memory,
+            hooks = hooks,
             onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
@@ -107,6 +120,7 @@ private fun ProductShell() {
             kind = SupportKind.Shelter,
             api = api,
             memory = memory,
+            hooks = hooks,
             onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )
@@ -114,6 +128,7 @@ private fun ProductShell() {
             kind = SupportKind.Peer,
             api = api,
             memory = memory,
+            hooks = hooks,
             onNeedSignIn = sessionRejected,
             onBack = { screen = RootScreen.Home },
         )

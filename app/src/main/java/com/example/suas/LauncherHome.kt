@@ -35,6 +35,8 @@ import com.example.suas.ui.theme.ShelterPurpleText
 @Composable
 fun LauncherHome(
     signedIn: Boolean,
+    environmentClass: String = com.example.suas.api.ClientPins.ENVIRONMENT_CLASS,
+    banner: String? = null,
     onSignIn: () -> Unit,
     onSignOut: () -> Unit,
     onRide: () -> Unit,
@@ -53,6 +55,15 @@ fun LauncherHome(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(24.dp))
+            if (banner != null) {
+                Text(
+                    text = banner,
+                    color = FooterTextGrey,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             TextButton(
                 onClick = { if (signedIn) onSignOut() else onSignIn() },
                 modifier = Modifier.fillMaxWidth(),
@@ -112,7 +123,7 @@ fun LauncherHome(
                     specVersion = com.example.suas.api.ClientPins.SPEC_VERSION,
                     manifest = com.example.suas.api.ClientPins.RELEASE_MANIFEST,
                     buildTimestamp = com.example.suas.api.ClientPins.BUILD_TIMESTAMP,
-                    environmentClass = com.example.suas.api.ClientPins.ENVIRONMENT_CLASS,
+                    environmentClass = environmentClass,
                 ),
             )
             Spacer(Modifier.height(12.dp))

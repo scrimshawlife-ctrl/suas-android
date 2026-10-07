@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Test harness. Debug builds only. Not exported. Absent from release. -->
+    <!-- Test harness and demo launchers. Debug builds only. Absent from release. -->
     <application>
         <activity
             android:name=".MainActivity"
@@ -8,5 +8,29 @@
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Suas"
             android:windowSoftInputMode="adjustResize" />
+        <!-- In-memory demo over synthetic fixtures. No network. -->
+        <activity
+            android:name=".DemoRootActivity"
+            android:exported="true"
+            android:label="@string/title_activity_demo"
+            android:theme="@style/Theme.Suas"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- Real client against a LOCAL Worker on the host (10.0.2.2:3000). -->
+        <activity
+            android:name=".LocalRootActivity"
+            android:exported="true"
+            android:label="@string/title_activity_local"
+            android:theme="@style/Theme.Suas"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

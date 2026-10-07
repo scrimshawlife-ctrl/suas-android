@@ -84,6 +84,73 @@ You need Android Studio (or the Android SDK) with JDK 11 or later.
 
 Open the project in Android Studio and run the `app` configuration (`RootActivity`) on an emulator or device. Point builds at staging or a local Worker; do not invent a production host.
 
+## Demo modes (debug builds only)
+
+Debug builds add two extra launcher icons next to the normal **SUAS** launcher
+(`RootActivity`, pinned STAGING `https://suasqrf.com`). Both live only in
+`app/src/debug`, so release builds are unchanged. All data is synthetic:
+`@example.invalid` emails and 555-0100 to 555-0199 phone numbers.
+
+| Launcher | Activity | Backend | Environment class |
+| --- | --- | --- | --- |
+| SUAS | `RootActivity` | STAGING `https://suasqrf.com` | STAGING |
+| SUAS Demo (no server) | `DemoRootActivity` | in-memory `DemoSuasApi`, no network | LOCAL |
+| SUAS Local Worker | `LocalRootActivity` | `http://10.0.2.2:3000` (host `npm run dev:demo`) | LOCAL |
+
+All three use the same product shell (`SuasProductShell`): SOS-first home cards,
+sign-in, and the four request screens. `ShellHooks` adds the demo banner,
+sign-in hint, and the "Demo only: advance status" button for the demo launcher;
+`RootActivity` always passes `ShellHooks.NONE`.
+
+### No-server demo
+
+```bash
+export ANDROID_HOME=/path/to/android-sdk
+./gradlew :app:installDebug
+adb shell am start -n com.example.suas/.DemoRootActivity
+```
+
+Sign in with `veteran@example.invalid` and code `246810` (shown on the sign-in
+screen). Each request screen opens with the seeded request for that category
+(Transportation MATCHING, Food FULFILLED and ready to confirm, Shelter
+CANCELLED, Peer Support CREATED); a new request can be submitted, advanced with
+the demo button, confirmed, or cancelled. `veteran3@example.invalid` has no case
+yet. State lives in memory only and resets when the process ends (D-034).
+
+`DemoSuasApi` loads `app/src/debug/resources/demo/demo-fixtures.json`, a copy of
+`contract/demo-fixtures.json`. That file is captured from the real LOCAL Worker
+in **suas** (`npm run dev:demo`, then
+`npm run demo:fixtures -- --out contract/demo-fixtures.json`), so the shapes
+match `/api/v0`. A unit test fails if the two copies drift.
+
+### Real client against a local Worker
+
+In a **suas** checkout run `npm run dev:demo` (Worker on
+`http://127.0.0.1:3000`), then start `LocalRootActivity`:
+
+```bash
+adb shell am start -n com.example.suas/.LocalRootActivity
+```
+
+The emulator reaches the host at `http://10.0.2.2:3000` (cleartext is allowed
+only for `localhost`, `127.0.0.1`, and `10.0.2.2` by
+`network_security_config.xml`). After tapping "Send sign-in code", read the
+one-time code on the host, because the app never calls `/api/v0/dev/*`:
+
+```bash
+curl "http://127.0.0.1:3000/api/v0/dev/last-challenge?destination=veteran@example.invalid"
+```
+
+### Checks
+
+```bash
+bash scripts/forbidden-capabilities.sh
+./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease
+```
+
+The build needs JDK 25 for the Gradle daemon toolchain. If Gradle cannot find
+it, pass `-Porg.gradle.java.installations.paths=$JAVA_HOME`.
+
 ## What SUAS is not
 
 SUAS is not an EHR, a diagnosis system, a suicide-prediction product, or an automated emergency dispatcher. The client must not auto-dial 911 or 988. Present crisis destinations only after an explicit person-initiated action, using released copy from SUAS-specs.
