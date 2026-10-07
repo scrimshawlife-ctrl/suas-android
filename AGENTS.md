@@ -2,6 +2,8 @@
 
 You are in **one of three** SUAS implementation surfaces. This clone is Android only.
 
+Product and repo context: [CONTEXT.md](CONTEXT.md).
+
 ## Sibling inventory
 
 | Repo | What it is |
