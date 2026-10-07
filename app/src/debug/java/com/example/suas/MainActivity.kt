@@ -69,6 +69,13 @@ import com.example.suas.ui.theme.ShelterPurpleBg
 import com.example.suas.ui.theme.ShelterPurpleText
 import com.example.suas.ui.theme.SuasTheme
 
+/**
+ * Banner on the debug-only MainActivity form. MainActivity is a test harness, not the
+ * product launcher; MainActivityHarnessTest keeps this label and its manifest scope.
+ */
+internal const val TEST_HARNESS_NOTICE =
+    "TEST HARNESS ONLY: not the product launcher. Product flows live on RootActivity with /api/v0."
+
 enum class Screen {
     Main,
     RideRequest
@@ -124,7 +131,7 @@ fun SuasScreen(onRideClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "TEST HARNESS ONLY — not the product launcher. Product flows live on RootActivity with /api/v0.",
+                    text = TEST_HARNESS_NOTICE,
                     color = FooterTextGrey,
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,

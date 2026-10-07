@@ -13,6 +13,7 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ### Added
 
+- `MainActivityHarnessTest` (local unit test) keeps the debug `MainActivity` form labeled and confined as a test harness: banner text `TEST_HARNESS_NOTICE`, `exported="false"` with no intent filter in the debug manifest, absent from the main manifest, `RootActivity` the only product launcher, and only the Demo and Local debug launchers. `forbidden-capabilities.sh` and an instrumented test also check the banner. The banner now uses a colon instead of an em dash.
 - `CONTEXT.md`: what SUAS is and is not, this repo's role, API contract, demo and local modes, versioning, hard walls. Linked from `AGENTS.md`.
 
 ### CI
