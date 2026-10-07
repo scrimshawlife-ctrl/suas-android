@@ -11,6 +11,10 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ## [Unreleased]
 
+### Added
+
+- `CONTEXT.md`: what SUAS is and is not, this repo's role, API contract, demo and local modes, versioning, hard walls. Linked from `AGENTS.md`.
+
 ### CI
 
 - Moved Node 20 actions to their current Node 24 majors (`actions/setup-java@v6`,
