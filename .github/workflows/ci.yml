@@ -144,7 +144,7 @@ jobs:
           disable-animations: true
           emulator-boot-timeout: 900
           disk-size: 4096M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -partition-size 4096 -disk-size 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -partition-size 4096
           script: |
             adb devices
             chmod +x ./gradlew
