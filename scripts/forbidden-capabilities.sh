@@ -11,6 +11,9 @@ note() { echo "FORBIDDEN: $*"; fail=1; }
 if grep -q 'MainActivity' "$main_manifest"; then
   note "MainActivity is in the main manifest"
 fi
+if ! grep -q 'text = TEST_HARNESS_NOTICE' "$src/debug/java/com/example/suas/MainActivity.kt"; then
+  note "MainActivity no longer shows the TEST HARNESS ONLY banner"
+fi
 if grep -q 'allowBackup="true"' "$main_manifest"; then
   note "allowBackup is still the template default"
 fi

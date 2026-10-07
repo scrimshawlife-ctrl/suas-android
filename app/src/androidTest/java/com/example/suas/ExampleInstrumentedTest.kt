@@ -36,6 +36,11 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    fun harnessBannerIsShown() {
+        composeRule.onNodeWithText(TEST_HARNESS_NOTICE).assertIsDisplayed()
+    }
+
+    @Test
     fun mainScreenDoesNotExposeUnreleasedCrisisDirectionsAndShowsSupportOptions() {
         composeRule.onNodeWithText("911", substring = true).assertDoesNotExist()
         composeRule.onNodeWithText("988", substring = true).assertDoesNotExist()
