@@ -11,7 +11,7 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ## [Unreleased]
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-10-07
 
 Implements SUAS-specs `0.6.0`. First versioned release of this fork. The
 previous `versionName` was `1.0`, a template default that wrongly implied a
