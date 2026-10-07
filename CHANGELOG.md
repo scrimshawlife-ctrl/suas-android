@@ -11,6 +11,12 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ## [Unreleased]
 
+### CI
+
+- Moved Node 20 actions to their current Node 24 majors (`actions/setup-java@v6`,
+  `actions/upload-artifact@v7`, `actions/checkout@v7` in the release workflow)
+  and pinned `ubuntu-latest` jobs to `ubuntu-24.04`. No app change.
+
 ## [0.1.0] - 2026-10-07
 
 Implements SUAS-specs `0.6.0`. First versioned release of this fork. The
