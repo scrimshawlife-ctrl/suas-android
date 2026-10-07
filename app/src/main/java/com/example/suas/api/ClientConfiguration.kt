@@ -12,7 +12,8 @@ object ClientPins {
     const val SPEC_VERSION = "0.6.0"
     const val RELEASE_MANIFEST = "RELEASE_MANIFEST-0.6.0.md"
     const val ALLOW_REAL_EXTERNAL_EFFECTS = false
-    const val APPLICATION_VERSION = "1.0"
+    /** Must equal versionName in app/build.gradle.kts (ContractTest checks). Pre-1.0: SPEC-018 blocked. */
+    const val APPLICATION_VERSION = "0.1.0"
     const val COMMIT = "SOURCE_TREE"
     const val BUILD_TIMESTAMP = "SOURCE_TREE"
     const val APPLICATION_ID_STATUS = "PLACEHOLDER_NOT_RELEASED"

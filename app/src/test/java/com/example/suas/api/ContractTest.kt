@@ -30,8 +30,16 @@ class ContractTest {
         assertEquals("STAGING", info.environmentClass)
         assertEquals("0.6.0", info.specVersion)
         assertEquals("RELEASE_MANIFEST-0.6.0.md", info.manifest)
-        assertEquals("1.0", info.appVersion)
+        assertEquals("0.1.0", info.appVersion)
         assertFalse(info.commit.isEmpty())
+    }
+
+    @Test
+    fun applicationVersionMatchesGradleVersionName() {
+        // Unit tests run with the app module as the working directory.
+        val gradle = java.io.File("build.gradle.kts").readText()
+        val versionName = Regex("versionName = \"([^\"]+)\"").find(gradle)?.groupValues?.get(1)
+        assertEquals(versionName, ClientPins.APPLICATION_VERSION)
     }
 
     @Test

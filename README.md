@@ -11,6 +11,14 @@ SUAS coordinates consented veteran support. Canonical product rules live in [SUA
 3. Read [AGENTS.md](AGENTS.md) before you change code.
 4. Open [MOBILE_SURFACE.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/MOBILE_SURFACE.md) in SUAS-specs (decision **D-033**) before you change networking.
 
+## Version
+
+`0.1.0` (`versionName`, `versionCode` 1). Implements SUAS-specs `0.6.0`.
+Pre-1.0 on purpose: SPEC-018 (store and launch) is blocked. See
+[CHANGELOG.md](CHANGELOG.md) and [RELEASING.md](RELEASING.md); the scheme is in
+SUAS-specs [VERSIONING.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/VERSIONING.md) section 8.
+Work is tracked on the [SUAS Product Board](https://github.com/users/scrimshawlife-ctrl/projects/6).
+
 ## Sibling repositories
 
 | Surface | Repository | Role |
@@ -24,22 +32,33 @@ Keep all three implementation repositories (**suas**, **suas-ios**, and **suas-a
 
 ## API contract
 
-The Android app is an ordinary authenticated client of the SUAS product API.
+The Android app is an ordinary authenticated client of the SUAS product API,
+`/api/v0` only. This README does not restate the contract; read it in
+SUAS-specs and the Worker:
 
-- **Path prefix:** `/api/v0`. That prefix is the only version selector.
-- **Contract file:** [docs/openapi/v0.json](https://github.com/scrimshawlife-ctrl/suas/blob/main/docs/openapi/v0.json) in **suas**.
-- **Auth:** opaque, server-revocable Bearer session (`Authorization: Bearer <credential>`), held in memory (`SessionStore`). Do not write it to disk (D-034).
-- **Sign-in:** `POST /api/v0/auth/challenges` then `POST /api/v0/auth/challenges/commands/verify`.
-- **Open a Case:** `POST /api/v0/cases` with `Idempotency-Key`. Never `POST /app/qrf/deploy`.
-- **Do not** add `/api/mobile`, a client-type header, `/api/v0/dev/*`, or a second version selector.
-- **Do not** drive HTML `/app/*` form commands from Android. Those routes belong to the web surface in **suas**.
-- **Do not** introduce a mobile test harness in this repository.
+| Topic | Source |
+| --- | --- |
+| Native client rules, environment classes, forbidden capabilities | [MOBILE_SURFACE.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/MOBILE_SURFACE.md) (D-033) |
+| How the native clients use `/api/v0` | [D033_NATIVE_CLIENT_INTEGRATION.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/D033_NATIVE_CLIENT_INTEGRATION.md) |
+| Sign-in, case open, chat parity | [D033_SIGN_IN_PARITY.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/D033_SIGN_IN_PARITY.md), [D033_CASE_OPEN.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/D033_CASE_OPEN.md), [D033_CHAT_PARITY.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/D033_CHAT_PARITY.md) |
+| Three-client inventory and current status | [REPOS.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/REPOS.md), [STATUS.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/STATUS.md) |
+| Machine-readable contract (pinned) | [docs/openapi/v0.json](https://github.com/scrimshawlife-ctrl/suas/blob/main/docs/openapi/v0.json) in **suas** |
 
-Default Retrofit host is staging `https://suasqrf.com` (`Backend.STAGING_BASE`). Emulator LOCAL is `http://10.0.2.2:3000`. Clients may still send build-pinned `Backend.SYNTHETIC_TENANT_ID`; the Worker resolves enrolled email → tenant and treats `tenant_id` as optional. The person must not pick an organization.
+Rules this code relies on: Bearer session held in memory only (`SessionStore`,
+D-034); no `/api/mobile`, client-type header, or second version selector; no
+HTML `/app/*` form commands; the app never calls the LOCAL-only `/api/v0/dev/*`
+routes (the no-server demo only imitates one in memory). Default host is staging `https://suasqrf.com`
+(`Backend.STAGING_BASE`); the emulator LOCAL host is `http://10.0.2.2:3000`.
 
 ## Staging host
 
 Synthetic staging is [https://suasqrf.com](https://suasqrf.com). Use it only for non-production builds. Staging must not use real veteran data or real external support effects.
+
+As of 2026-10-07 staging runs **suas** `0f7aeae`, which fixed path-parameter
+routes such as `GET /api/v0/cases/{id}/service-requests` (they used to answer
+`400`). Staging is deployed only when an owner runs the **suas** `worker-deploy`
+workflow by hand; `staging-path-param-check` runs after each deploy. Details:
+[suas README](https://github.com/scrimshawlife-ctrl/suas#synthetic-staging-deploys).
 
 ## Current code (observed)
 
