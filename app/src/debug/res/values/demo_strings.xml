@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Debug-only launcher labels. Absent from release builds. -->
+    <string name="title_activity_demo">SUAS Demo (no server)</string>
+    <string name="title_activity_local">SUAS Local Worker</string>
+</resources>

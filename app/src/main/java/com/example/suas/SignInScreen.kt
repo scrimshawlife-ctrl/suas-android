@@ -36,8 +36,10 @@ fun SignInScreen(
     session: SessionStore,
     onSignedIn: () -> Unit,
     onBack: () -> Unit,
+    hint: String? = null,
+    prefillEmail: String = "",
 ) {
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(prefillEmail) }
     var code by remember { mutableStateOf("") }
     var waitingForCode by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("If this email is enrolled, a one-time sign-in code was sent.") }
@@ -55,6 +57,10 @@ fun SignInScreen(
             "Use the email on your enrollment. This does not create an account.",
             fontSize = 14.sp,
         )
+        if (hint != null) {
+            Spacer(Modifier.height(8.dp))
+            Text(hint, fontSize = 14.sp)
+        }
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = email,
