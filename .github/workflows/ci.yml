@@ -1,6 +1,11 @@
 # Android hygiene CI. SPEC-018 remains KEEP_BLOCKED.
 # Emulator/instrumented acceptance is not claimed here.
 # DEVICE_ACCEPTANCE_REQUIRED remains for on-device checks.
+#
+# Added on demo-data-mode: the `demo-launchers` job is the only emulator job. It launches each
+# debug-only demo launcher (in-memory DemoSuasApi, and the real client against a LOCAL Worker on
+# http://10.0.2.2:3000) and walks sign-in plus the seeded service screens. It is not on-device
+# acceptance, it does not replace DEVICE_ACCEPTANCE_REQUIRED, and it does not change `contract`.
 
 name: ci
 
@@ -41,4 +46,121 @@ jobs:
         with:
           name: android-release-apk
           path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: ignore
+
+  demo-launchers:
+    name: demo launchers (emulator)
+    # Pull requests only. Building an AVD and running two instrumented journeys takes tens of
+    # minutes and is not meant for every push to main.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      # GitHub-hosted Linux runners expose /dev/kvm; the udev rule is the documented way to
+      # make it usable by the runner user.
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
+      # The emulator reserves the userdata partition as a real file on disk. This has to run
+      # before the AVD is created, otherwise avdmanager/the emulator fails with
+      # "Not enough space to create userdata partition".
+      - name: Free disk space before creating the AVD
+        run: |
+          df -h /
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/boost \
+            /usr/local/lib/android/sdk/ndk \
+            /opt/microsoft/msodbcsql17 \
+            /opt/microsoft/msodbcsql18 \
+            || true
+          sudo apt-get clean
+          df -h /
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # LOCAL demo path: the Worker that `Backend.LOCAL_BASE` (http://10.0.2.2:3000) points at.
+      - name: Checkout suas Worker (main)
+        uses: actions/checkout@v5
+        with:
+          repository: scrimshawlife-ctrl/suas
+          ref: main
+          path: suas
+          # suas is public; default GITHUB_TOKEN is enough to checkout it
+          # If that ever changes, Danny can add a read-only SUAS_CHECKOUT_TOKEN secret.
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Worker dependencies
+        working-directory: suas
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Start LOCAL demo Worker (npm run dev:demo)
+        working-directory: suas
+        run: |
+          nohup npm run dev:demo > "$GITHUB_WORKSPACE/dev-demo.log" 2>&1 < /dev/null &
+          echo $! > /tmp/dev-demo.pid
+          echo "worker pid $(cat /tmp/dev-demo.pid)"
+
+      # 10.0.2.2 inside the emulator is the host loopback, so the Worker may stay bound to
+      # 127.0.0.1. Only the host port has to be open.
+      - name: Wait for the Worker on host port 3000
+        run: |
+          for _ in $(seq 1 150); do
+            if (echo > /dev/tcp/127.0.0.1/3000) >/dev/null 2>&1; then
+              echo "worker listening on 127.0.0.1:3000; emulator reaches it at 10.0.2.2:3000"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "worker did not open port 3000"
+          tail -n 200 "$GITHUB_WORKSPACE/dev-demo.log" || true
+          exit 1
+
+      - name: Instrumented launcher tests on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          avd-name: suas-demo
+          force-avd-creation: true
+          disable-animations: true
+          emulator-boot-timeout: 900
+          disk-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -partition-size 4096 -disk-size 4096M
+          script: |
+            adb devices
+            chmod +x ./gradlew
+            ./gradlew :app:connectedDebugAndroidTest --stacktrace
+
+      - name: Worker log
+        if: always()
+        run: tail -n 300 "$GITHUB_WORKSPACE/dev-demo.log" || true
+
+      - name: Upload instrumented test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-instrumented-reports
+          path: |
+            app/build/reports/androidTests/**
+            app/build/outputs/androidTest-results/**
+            dev-demo.log
           if-no-files-found: ignore
