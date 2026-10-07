@@ -71,6 +71,23 @@ internal fun ComposeTestRule.awaitSignedIn(timeoutMillis: Long = IN_MEMORY_TIMEO
 }
 
 /**
+ * Waits until at least one node carrying [text] exists in the semantics tree.
+ *
+ * This is the existence check (no visibility requirement, so it also passes for content that
+ * sits below the fold). It is preferred over `assertExists()` because the pinned
+ * compose-ui-test artifact in this module does not expose that extension.
+ */
+internal fun ComposeTestRule.awaitTextExists(
+    text: String,
+    substring: Boolean = true,
+    timeoutMillis: Long = IN_MEMORY_TIMEOUT_MS,
+) {
+    waitUntil(timeoutMillis = timeoutMillis) {
+        onAllNodesWithText(text, substring = substring).fetchSemanticsNodes().isNotEmpty()
+    }
+}
+
+/**
  * Opens one seeded service screen from the home surface, asserts the screen and its submit
  * control, runs [onScreen] while it is open, then returns home.
  */

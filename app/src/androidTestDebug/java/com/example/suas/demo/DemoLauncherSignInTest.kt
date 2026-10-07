@@ -1,6 +1,5 @@
 package com.example.suas.demo
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -41,15 +40,14 @@ class DemoLauncherSignInTest {
         // demo request for that category through the demo-only advance control.
         for (title in SEEDED_SCREEN_TITLES) {
             composeRule.walkSeededScreen(title) {
-                composeRule.onNodeWithText("Demo only: advance status", substring = true)
-                    .assertExists()
+                composeRule.awaitTextExists("Demo only: advance status")
             }
         }
 
         // One seeded request moves a status step inside the demo launcher.
         composeRule.walkSeededScreen("Transportation") {
             composeRule.onNodeWithText("Demo only: advance status", substring = true).performClick()
-            composeRule.onNodeWithText("Demo only: advance status", substring = true).assertExists()
+            composeRule.awaitTextExists("Demo only: advance status")
         }
 
         composeRule.onNodeWithText("Transportation", substring = false).performScrollTo()
