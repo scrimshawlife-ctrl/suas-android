@@ -123,6 +123,13 @@ in **suas** (`npm run dev:demo`, then
 `npm run demo:fixtures -- --out contract/demo-fixtures.json`), so the shapes
 match `/api/v0`. A unit test fails if the two copies drift.
 
+The Worker repo (**suas**) owns this fixture. Both files here are copies of the
+Worker export: do not hand-edit them. To change demo data, change the seed in
+**suas**, re-run `npm run demo:fixtures` there, and copy the output over both
+`contract/demo-fixtures.json` and `app/src/debug/resources/demo/demo-fixtures.json`.
+Demo mode lives only in the `debug` source set (no product flavor), so release
+builds contain neither the fixture nor the demo launchers.
+
 ### Real client against a local Worker
 
 In a **suas** checkout run `npm run dev:demo` (Worker on
