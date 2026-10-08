@@ -16,7 +16,7 @@
         <activity
             android:name=".RootActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
+            android:label="@string/title_activity_root"
             android:theme="@style/Theme.Suas"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

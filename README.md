@@ -105,14 +105,14 @@ Open the project in Android Studio and run the `app` configuration (`RootActivit
 
 ## Demo modes (debug builds only)
 
-Debug builds add two extra launcher icons next to the normal **SUAS** launcher
+Debug builds add two extra launcher icons next to the normal **Veteran's Passport** launcher
 (`RootActivity`, pinned STAGING `https://suasqrf.com`). Both live only in
 `app/src/debug`, so release builds are unchanged. All data is synthetic:
 `@example.invalid` emails and 555-0100 to 555-0199 phone numbers.
 
 | Launcher | Activity | Backend | Environment class |
 | --- | --- | --- | --- |
-| SUAS | `RootActivity` | STAGING `https://suasqrf.com` | STAGING |
+| Veteran's Passport | `RootActivity` | STAGING `https://suasqrf.com` | STAGING |
 | SUAS Demo (no server) | `DemoRootActivity` | in-memory `DemoSuasApi`, no network | LOCAL |
 | SUAS Local Worker | `LocalRootActivity` | `http://10.0.2.2:3000` (host `npm run dev:demo`) | LOCAL |
 
