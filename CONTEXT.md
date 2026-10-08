@@ -54,11 +54,11 @@ A change to the product API, Veteran journey, auth, or environment class must be
 
 ## Demo and local modes (debug builds only)
 
-Debug builds add two launchers next to **SUAS** (`RootActivity`, STAGING). Both live only in `app/src/debug`, so release builds are unchanged.
+Debug builds add two launchers next to **Veteran's Passport** (`RootActivity`, STAGING). Both live only in `app/src/debug`, so release builds are unchanged.
 
 | Launcher | Activity | Backend |
 | --- | --- | --- |
-| SUAS | `RootActivity` | STAGING `https://suasqrf.com` |
+| Veteran's Passport | `RootActivity` | STAGING `https://suasqrf.com` |
 | SUAS Demo (no server) | `DemoRootActivity` | in-memory `DemoSuasApi`, no network |
 | SUAS Local Worker | `LocalRootActivity` | `http://10.0.2.2:3000` (`npm run dev:demo` in `suas`) |
 
@@ -86,3 +86,4 @@ Debug builds add two launchers next to **SUAS** (`RootActivity`, STAGING). Both 
 - [AGENTS.md](AGENTS.md), [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md)
 - SUAS-specs: [AGENTS.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/AGENTS.md), [MOBILE_SURFACE.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/MOBILE_SURFACE.md), [STATUS.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/STATUS.md), [REPOS.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/REPOS.md)
 - Board: [SUAS Product Board](https://github.com/users/scrimshawlife-ctrl/projects/6)
+- Mac device work (emulator, screenshots, local-runner CI): SUAS-specs [docs/handoffs/MAC_DEVICE_WORK.md](https://github.com/scrimshawlife-ctrl/SUAS-specs/blob/main/docs/handoffs/MAC_DEVICE_WORK.md)
