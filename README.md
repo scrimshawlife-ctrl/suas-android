@@ -54,9 +54,11 @@ routes (the no-server demo only imitates one in memory). Default host is staging
 
 Synthetic staging is [https://suasqrf.com](https://suasqrf.com). Use it only for non-production builds. Staging must not use real veteran data or real external support effects.
 
-As of 2026-10-07 staging runs **suas** `0f7aeae`, which fixed path-parameter
-routes such as `GET /api/v0/cases/{id}/service-requests` (they used to answer
-`400`). Staging is deployed only when an owner runs the **suas** `worker-deploy`
+As of 2026-10-08 staging runs **suas** `80c27e7`. The web sign-in page shows
+`demo@example.invalid` and code `123456`. The Veteran's Passport launcher does
+not prefill that account; typing it signs in against this host. Path-parameter
+routes such as `GET /api/v0/cases/{id}/service-requests` stay fixed (suas #187).
+Staging is deployed only when an owner runs the **suas** `worker-deploy`
 workflow by hand; `staging-path-param-check` runs after each deploy. Details:
 [suas README](https://github.com/scrimshawlife-ctrl/suas#synthetic-staging-deploys).
 
@@ -162,8 +164,9 @@ The emulator reaches the host at `http://10.0.2.2:3000` (cleartext is allowed
 only for `localhost`, `127.0.0.1`, and `10.0.2.2` by
 `network_security_config.xml`). Sign in with `demo@example.invalid` (prefilled)
 and code `123456`: the LOCAL demo Worker issues that fixed code to this one
-account only (`SUAS_DEMO_FIXED_CODE=enabled`, set by `npm run dev:demo`; the
-Worker refuses it outside LOCAL). For any other account, read the one-time code
+account only (`SUAS_DEMO_FIXED_CODE=enabled`, set by `npm run dev:demo`). The
+synthetic STAGING Worker accepts the same account when its deploy sets the
+flag. TEST and PRODUCTION reject it. For any other account, read the one-time code
 on the host, because the app never calls `/api/v0/dev/*`:
 
 ```bash

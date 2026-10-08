@@ -62,7 +62,7 @@ Debug builds add two launchers next to **Veteran's Passport** (`RootActivity`, S
 | SUAS Demo (no server) | `DemoRootActivity` | in-memory `DemoSuasApi`, no network |
 | SUAS Local Worker | `LocalRootActivity` | `http://10.0.2.2:3000` (`npm run dev:demo` in `suas`) |
 
-- Sign in as `demo@example.invalid` with code `123456`; `newvet@example.invalid` has no case.
+- Sign in as `demo@example.invalid` with code `123456`; `newvet@example.invalid` has no case. The synthetic STAGING Worker accepts that account, and its web sign-in page shows the email and code. The Veteran's Passport launcher does not prefill it. TEST and PRODUCTION reject the flag.
 - `contract/demo-fixtures.json` and `app/src/debug/resources/demo/demo-fixtures.json` are copies of the `suas` export (`npm run demo:fixtures`). Do not hand-edit them.
 - Checks: `bash scripts/forbidden-capabilities.sh` and `./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease`.
 

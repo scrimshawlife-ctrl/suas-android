@@ -13,6 +13,7 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ### Changed
 
+- README and `CONTEXT.md`: synthetic STAGING at `https://suasqrf.com` runs `suas` `80c27e7`. The web sign-in page shows `demo@example.invalid` / `123456`. The Veteran's Passport launcher does not prefill that account; typing it signs in against the host.
 - The product launcher (`RootActivity`) is labeled "Veteran's Passport", matching the iOS display name, instead of the template "MainActivity" title. New string `title_activity_root`; `LauncherLabelTest` pins it. The application label `app_name` ("Suas") is unchanged because the activity label is what the launcher shows. Debug Demo and Local launcher labels are unchanged.
 
 ### Added
