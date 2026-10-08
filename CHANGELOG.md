@@ -23,6 +23,9 @@ listing or launch: SPEC-018 is blocked. Release steps: [RELEASING.md](RELEASING.
 
 ### CI
 
+- Pull requests run `demo launchers (emulator)`: debug Demo and Local journeys
+  on an emulator. Sign-in is `demo@example.invalid` / `123456`. The Compose
+  finder `onAllNodes` is called on the test rule. It is not a top-level import.
 - Moved Node 20 actions to their current Node 24 majors (`actions/setup-java@v6`,
   `actions/upload-artifact@v7`, `actions/checkout@v7` in the release workflow)
   and pinned `ubuntu-latest` jobs to `ubuntu-24.04`. No app change.
